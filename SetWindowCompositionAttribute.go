@@ -15,6 +15,14 @@ const (
 	ACCENT_ENABLE_TRANSPARENT         = iota // [7] Unknown. Seems to draw background fully transparent.
 )
 
+const (
+	DrawLeftBorder   = 0x20
+	DrawTopBorder    = 0x40
+	DrawRightBorder  = 0x80
+	DrawBottomBorder = 0x100
+	DrawAllBorders   = (DrawLeftBorder | DrawTopBorder | DrawRightBorder | DrawBottomBorder)
+)
+
 type ACCENT_POLICY struct {
 	ACCENT_STATE  int
 	AccentFlags   uint32
@@ -56,14 +64,12 @@ type WINCOMPATTRDATA struct {
 }
 
 func SetWindowCompositionAttribute(hwnd HWND, accent_state int, dword uint32) bool {
-	var accent = ACCENT_POLICY{}
-	accent.ACCENT_STATE = accent_state
+	var accent = ACCENT_POLICY{ACCENT_STATE: accent_state}
 	data := WINCOMPATTRDATA{
 		nAttribute: WCA_ACCENT_POLICY,
 		pData:      &accent,
 	}
 	data.ulDataSize = uint32(unsafe.Sizeof(data))
-
 	ret, _, _ := syscall.Syscall(setWindowCompositionAttribute.Addr(), 2,
 		uintptr(hwnd),
 		uintptr(unsafe.Pointer(&data)),

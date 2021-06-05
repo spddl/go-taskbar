@@ -11,9 +11,7 @@ import (
 type HANDLE uintptr
 type HWND HANDLE
 
-const (
-	zeroHandle = HWND(0)
-)
+const zeroHandle = HWND(0)
 
 var (
 	// Library
@@ -21,6 +19,8 @@ var (
 	setWindowCompositionAttribute *windows.LazyProc
 	messageBox                    *windows.LazyProc
 	findWindow                    *windows.LazyProc
+	findWindowEx                  *windows.LazyProc
+	registerWindowMessage         *windows.LazyProc
 
 	FLAG_ACCENT int
 )
@@ -33,8 +33,16 @@ func init() {
 	setWindowCompositionAttribute = libuser32.NewProc("SetWindowCompositionAttribute")
 	messageBox = libuser32.NewProc("MessageBoxW")
 	findWindow = libuser32.NewProc("FindWindowW")
+	findWindowEx = libuser32.NewProc("FindWindowExW")
+	registerWindowMessage = libuser32.NewProc("RegisterWindowMessageW")
 
-	flag.IntVar(&FLAG_ACCENT, "accent", 0, "help message for flagname")
+	flag.IntVar(&FLAG_ACCENT, "accent", 0, `1 Default value. Background is black.
+2 Background is GradientColor, alpha channel ignored.
+3 Background is GradientColor.
+4 Background is GradientColor, with blur effect.
+5 Background is GradientColor, with acrylic blur effect.
+6 Unknown.
+7 Unknown. Seems to draw background fully transparent.`)
 	flag.Parse()
 
 	if len(os.Args) < 2 {
